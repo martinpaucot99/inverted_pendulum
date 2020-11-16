@@ -1,0 +1,97 @@
+# ----------------------------------------------------Question 3 -------------------------------------------------------
+import sympy as sym
+import control as ctrl
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Defining Variables
+m, ell, x3, x4, M, g, F, m = sym.symbols('m, ell, x3, x4, M, g, F, m')
+
+# φ(F, x3, x4)
+phi = 4*m*ell*x4**2*sym.sin(x3) + 4*F - 3*m*g*sym.sin(x3)*sym.cos(x3)
+phi /= 4*(M+m) - 3*m*sym.cos(x3)**2
+
+#  ψ(F, x3, x4)
+psi = -3*(m*ell*(x4)**2*sym.sin(x3)*sym.cos(x3)+F*sym.cos(x3)-(M+m)*g*sym.sin(x3))
+psi /= ((4*(M+m)-3*m*sym.cos(x3)**2)*ell)
+
+# Differentiating Equations
+dphi_x3 = phi.diff(x3)
+dphi_x4 = phi.diff(x4)
+dphi_F = phi.diff(F)
+
+dpsi_x3 = psi.diff(x3)
+dpsi_x4 = psi.diff(x4)
+dpsi_F = psi.diff(F)
+
+# Setting equilibrium point
+Feq = 0
+x3eq = 0
+x4eq = 0
+
+# Defining (F, x3, x4) at equilibrium
+dphi_F_eq = dphi_F.subs([(F, Feq), (x3, x3eq), (x4, x4eq)])
+dphi_x3_eq = dphi_x3.subs([(F, Feq), (x3, x3eq), (x4, x4eq)])
+dphi_x4_eq = dphi_x4.subs([(F, Feq), (x3, x3eq), (x4, x4eq)])
+
+dpsi_F_eq = dpsi_F.subs([(F, Feq), (x3, x3eq), (x4, x4eq)])
+dpsi_x3_eq = dpsi_x3.subs([(F, Feq), (x3, x3eq), (x4, x4eq)])
+dpsi_x4_eq = dpsi_x4.subs([(F, Feq), (x3, x3eq), (x4, x4eq)])
+
+# Definitions of positive real constants
+a = dphi_F_eq
+b = -dphi_x3_eq
+c = 3/(ell*(4*M + m))
+d = 3*(M+m)*g/(ell*(4*M + m))
+
+# Given Values
+M_value = 0.3
+m_value = 0.1
+g_value = 9.81
+ell_value = 0.35
+
+def evaluate_at_given_parameters(z):
+    return z.subs([(M, M_value), (m, m_value), (ell, ell_value), (g, g_value)])
+
+a_value = evaluate_at_given_parameters(a)
+b_value = evaluate_at_given_parameters(b)
+c_value = evaluate_at_given_parameters(c)
+d_value = evaluate_at_given_parameters(d)
+
+# -----------------------------------
+# Control library of Python
+# -----------------------------------
+a, b, c, d = sym.symbols('a:d', real=True, positive=True)
+s, t = sym.symbols('s, t')
+
+transfer_function_F_to_x3 = -c/(s**2 - d)
+transfer_function_F_to_x1 = (a*(s**2 - d) + b*c)/(s**2)*(s**2-d)
+
+# Impulse Response(kick)
+Xs_impulse = 1
+
+# G_theta response
+x3t_impulse = sym.inverse_laplace_transform(transfer_function_F_to_x3 * Xs_impulse, s, t)
+sym.pprint(x3t_impulse)
+# G_x response
+x1t_impulse = sym.inverse_laplace_transform(transfer_function_F_to_x1 * Xs_impulse, s, t)
+sym.pprint(x1t_impulse)
+
+# Step Response(Push)
+Xs_step = 1/s
+# G_theta response
+x3t_step = sym.inverse_laplace_transform(transfer_function_F_to_x3 * Xs_step, s, t)
+sym.pprint(x3t_step)
+# G_x response
+x1t_step = sym.inverse_laplace_transform(transfer_function_F_to_x1 * Xs_step, s, t)
+sym.pprint(x1t_step)
+
+# Frequency Response(shake)
+w = 50
+Xs_shake = w/(s**2 + w**2)
+# G_theta response
+x3t_shake = sym.inverse_laplace_transform(transfer_function_F_to_x3 * Xs_shake, s, t)
+sym.pprint(x3t_shake)
+# G_x response
+x1t_shake = sym.inverse_laplace_transform(transfer_function_F_to_x1 * Xs_shake, s, t)
+sym.pprint(x1t_shake)
