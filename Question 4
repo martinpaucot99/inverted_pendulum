@@ -72,10 +72,13 @@ t_final = 0.2
 t_span = np.linspace(0, t_final, n_points)
 input_signal = np.sin(100*(t_span**2))
 transfer_function_F2x3 = ctrl.TransferFunction([-c_value], [1, 0, -d_value])
-transfer_function_F2x1 = ctrl.TransferFunction([a_value, 0,(-a_value*d_value)+(b_value*c_value)],[1, 0, -d_value, 0, 0])
+transfer_function_F2x1 = ctrl.TransferFunction([a_value, 0,(-a_value*d_value)\
+    +(b_value*c_value)],[1, 0, -d_value, 0, 0])
 
-tf_out1, t_out1, Ft_out1= ctrl.forced_response(transfer_function_F2x3, t_span, input_signal)
-tf_out2, t_out2, Ft_out2= ctrl.forced_response(transfer_function_F2x1, t_span, input_signal)
+tf_out1, t_out1, Ft_out1= ctrl.forced_response\
+    (transfer_function_F2x3, t_span, input_signal)
+tf_out2, t_out2, Ft_out2= ctrl.forced_response\
+    (transfer_function_F2x1, t_span, input_signal)
 
 # Graph
 plt.plot(tf_out1, t_out1)
