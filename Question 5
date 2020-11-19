@@ -51,7 +51,8 @@ g_value = 9.81
 ell_value = 0.35
 
 def evaluate_at_given_parameters(z):
-    return float(z.subs([(M, M_value), (m, m_value), (ell, ell_value), (g, g_value)]))
+    return float(z.subs([(M, M_value), (m, m_value), (ell, ell_value),
+                (g, g_value)]))
 
 a_value = evaluate_at_given_parameters(a)
 b_value = evaluate_at_given_parameters(b)
@@ -68,11 +69,18 @@ def pid(Kp, Ki, Kd):
     Gc += ctrl.TransferFunction([Kd, 0], [1])
     Gc += ctrl.TransferFunction([Ki], [1, 0])
     return Gc
-
-transfer_function_pid = -pid(Kp=10, Ki=0.1, Kd=0.1)
+n_points = 100
+t_final = 1
+t_span = np.linspace(0, t_final, n_points)
+transfer_function_pid = -pid(Kp=200, Ki=0.2, Kd=8)
 overall_tf = ctrl.feedback(transfer_function_F2x3, transfer_function_pid)
-t_imp, x3_imp = ctrl.impulse_response(overall_tf)
+t_imp, x3_imp = ctrl.impulse_response(overall_tf, t_span)
+angle_imp = (x3_imp*(180/np.pi))
 
 # Graph
-plt.plot(t_imp, x3_imp)
+plt.plot(t_imp, angle_imp)
+plt.xlabel('Time (s)')
+plt.ylabel('Angle (degrees)')
+plt.grid()
+plt.savefig("Question 5")
 plt.show()
