@@ -65,33 +65,41 @@ a, b, c, d = sym.symbols('a:d', real=True, positive=True)
 s, t = sym.symbols('s, t')
 
 transfer_function_F_to_x3 = -c/(s**2 - d)
-transfer_function_F_to_x1 = (a*(s**2 - d) + b*c)/(s**2)*(s**2-d)
+transfer_function_F_to_x1 = ((a*s**2) - (a*d) + (b*c))/(s**4 - (d * s**2))
 
-# Impulse Response(kick)
+# impulse Response(kick)
 Xs_impulse = 1
 
 # G_theta response
 x3t_impulse = sym.inverse_laplace_transform(transfer_function_F_to_x3 * Xs_impulse, s, t)
-sym.pprint(x3t_impulse)
+sym.pprint(x3t_impulse.simplify())
 # G_x response
 x1t_impulse = sym.inverse_laplace_transform(transfer_function_F_to_x1 * Xs_impulse, s, t)
-sym.pprint(x1t_impulse)
+sym.pprint(x1t_impulse.simplify())
 
 # Step Response(Push)
 Xs_step = 1/s
 # G_theta response
 x3t_step = sym.inverse_laplace_transform(transfer_function_F_to_x3 * Xs_step, s, t)
-sym.pprint(x3t_step)
+sym.pprint(x3t_step.simplify())
 # G_x response
 x1t_step = sym.inverse_laplace_transform(transfer_function_F_to_x1 * Xs_step, s, t)
-sym.pprint(x1t_step)
+sym.pprint(x1t_step.simplify())
 
 # Frequency Response(shake)
-w = 50
+w = sym.symbols('w', real=True)
 Xs_shake = w/(s**2 + w**2)
+
 # G_theta response
-x3t_shake = sym.inverse_laplace_transform(transfer_function_F_to_x3 * Xs_shake, s, t)
-sym.pprint(x3t_shake)
+x3t_shake = sym.inverse_laplace_transform(transfer_function_F_to_x3 * Xs_shake, s, t, w)
+sym.pprint(x3t_shake.simplify())
 # G_x response
-x1t_shake = sym.inverse_laplace_transform(transfer_function_F_to_x1 * Xs_shake, s, t)
-sym.pprint(x1t_shake)
+x1t_shake = sym.inverse_laplace_transform(transfer_function_F_to_x1 * Xs_shake, s, t, w)
+sym.pprint(x1t_shake.simplify())
+
+print(sym.latex(x3t_impulse.simplify()))
+print(sym.latex(x1t_impulse.simplify()))
+print(sym.latex(x3t_step.simplify()))
+print(sym.latex(x1t_step.simplify()))
+print(sym.latex(x3t_shake.simplify()))
+print(sym.latex(x1t_shake.simplify()))
